@@ -1,0 +1,31 @@
+# Godot 4+ specific
+.godot/
+/android/
+
+# Godot import cache (legacy)
+.import/
+
+# Export presets (보통 개인 환경 의존이라 제외, 필요시 화이트리스트)
+export.cfg
+export_presets.cfg
+
+# 자동 생성 번역
+*.translation
+
+# Mono / C# (혹시 나중에 쓸 경우 대비)
+.mono/
+data_*/
+mono_crash.*.json
+
+# OS / 에디터
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Claude 작업용 (전역 gitignore에도 등록되어 있지만 이중 안전장치)
+.claude-workspace/
+
+# Godot MCP Pro addon (proprietary, 재배포 금지 — 라이선스 가드)
+games/*/addons/godot_mcp/
