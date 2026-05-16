@@ -23,3 +23,12 @@ func reset_and_launch() -> void:
 
 func _process(delta: float) -> void:
 	position += velocity * delta
+	_bounce_off_walls()
+
+func _bounce_off_walls() -> void:
+	if position.y <= 0.0 and velocity.y < 0.0:
+		position.y = 0.0
+		velocity.y = -velocity.y
+	elif position.y + BALL_SIZE >= VIEWPORT_HEIGHT and velocity.y > 0.0:
+		position.y = VIEWPORT_HEIGHT - BALL_SIZE
+		velocity.y = -velocity.y
