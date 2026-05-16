@@ -9,6 +9,9 @@ size = Vector2(32, 48)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ig7tw"]
 size = Vector2(40, 48)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kek77"]
+size = Vector2(32, 48)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h2yge"]
 size = Vector2(1152, 40)
 
@@ -62,6 +65,12 @@ offset_top = -24.0
 offset_right = 20.0
 offset_bottom = 24.0
 color = Color(1, 0.3, 0.3, 0.55)
+
+[node name="Hurtbox" type="Area2D" parent="Player" unique_id=860322841]
+monitorable = false
+
+[node name="CollisionShape" type="CollisionShape2D" parent="Player/Hurtbox" unique_id=184378146]
+shape = SubResource("RectangleShape2D_kek77")
 
 [node name="Platforms" type="Node2D" parent="." unique_id=391746418]
 
@@ -119,7 +128,7 @@ shape = SubResource("RectangleShape2D_7mycd")
 
 [node name="Enemies" type="Node2D" parent="." unique_id=859071399]
 
-[node name="Enemy1" type="CharacterBody2D" parent="Enemies" unique_id=366346331]
+[node name="Enemy1" type="CharacterBody2D" parent="Enemies" unique_id=366346331 groups=["enemies"]]
 position = Vector2(950, 580)
 script = ExtResource("2_0xm2m")
 
@@ -136,7 +145,7 @@ target_position = Vector2(0, 28)
 [node name="CollisionShape" type="CollisionShape2D" parent="Enemies/Enemy1" unique_id=580350749]
 shape = SubResource("RectangleShape2D_272bh")
 
-[node name="Enemy2" type="CharacterBody2D" parent="Enemies" unique_id=410929841]
+[node name="Enemy2" type="CharacterBody2D" parent="Enemies" unique_id=410929841 groups=["enemies"]]
 position = Vector2(750, 370)
 script = ExtResource("2_0xm2m")
 initial_direction = 1

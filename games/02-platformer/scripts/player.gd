@@ -8,17 +8,17 @@ const HITBOX_OFFSET: float = 30.0
 
 var facing: int = 1
 var is_attacking: bool = false
+var spawn_position: Vector2
 
 @onready var hitbox: Area2D = $Hitbox
 @onready var hitbox_visual: ColorRect = $Hitbox/Visual
+@onready var hurtbox: Area2D = $Hurtbox
 
 func _ready() -> void:
+	spawn_position = position
 	_set_hitbox_active(false)
 	hitbox.body_entered.connect(_on_hitbox_body_entered)
-
-func _on_hitbox_body_entered(body: Node) -> void:
-	if body.has_method("die"):
-		body.die()
+	hurtbox.body_entered.connect(_on_hurtbox_body_entered)
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
@@ -45,7 +45,7 @@ func _physics_process(delta: float) -> void:
 
 func _perform_attack() -> void:
 	is_attacking = true
-	hitbox.position.x = facing * HITBOX_OFFSET
+	hitbox.position.x = float(facing) * HITBOX_OFFSET
 	_set_hitbox_active(true)
 	await get_tree().create_timer(ATTACK_DURATION).timeout
 	_set_hitbox_active(false)
@@ -54,3 +54,17 @@ func _perform_attack() -> void:
 func _set_hitbox_active(active: bool) -> void:
 	hitbox.monitoring = active
 	hitbox_visual.visible = active
+
+func _on_hitbox_body_entered(body: Node) -> void:
+	if body.is_in_group("enemies") and body.has_method("die"):
+		body.die()
+
+func _on_hurtbox_body_entered(body: Node) -> void:
+	if body.is_in_group("enemies"):
+		_die_and_respawn()
+
+func _die_and_respawn() -> void:
+	velocity = Vector2.ZERO
+	position = spawn_position
+	is_attacking = false
+	_set_hitbox_active(false)
