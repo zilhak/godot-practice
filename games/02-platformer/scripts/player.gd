@@ -14,6 +14,11 @@ var is_attacking: bool = false
 
 func _ready() -> void:
 	_set_hitbox_active(false)
+	hitbox.body_entered.connect(_on_hitbox_body_entered)
+
+func _on_hitbox_body_entered(body: Node) -> void:
+	if body.has_method("die"):
+		body.die()
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():

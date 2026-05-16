@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bpmrvciu2q13f"]
 
 [ext_resource type="Script" uid="uid://2rjtpxtho07f" path="res://scripts/player.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://cpxqqhtvhp2en" path="res://scripts/enemy.gd" id="2_0xm2m"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0xm2m"]
 size = Vector2(32, 48)
@@ -19,6 +20,12 @@ size = Vector2(200, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7mycd"]
 size = Vector2(160, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_272bh"]
+size = Vector2(32, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5vw27"]
+size = Vector2(32, 32)
 
 [node name="Main" type="Node2D" unique_id=138050611]
 
@@ -109,3 +116,40 @@ color = Color(0.45, 0.4, 0.55, 1)
 
 [node name="CollisionShape" type="CollisionShape2D" parent="Platforms/Plat3" unique_id=559489248]
 shape = SubResource("RectangleShape2D_7mycd")
+
+[node name="Enemies" type="Node2D" parent="." unique_id=859071399]
+
+[node name="Enemy1" type="CharacterBody2D" parent="Enemies" unique_id=366346331]
+position = Vector2(950, 580)
+script = ExtResource("2_0xm2m")
+
+[node name="Sprite" type="ColorRect" parent="Enemies/Enemy1" unique_id=782709368]
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+color = Color(0.85, 0.3, 0.7, 1)
+
+[node name="FloorRay" type="RayCast2D" parent="Enemies/Enemy1" unique_id=31013040]
+target_position = Vector2(0, 28)
+
+[node name="CollisionShape" type="CollisionShape2D" parent="Enemies/Enemy1" unique_id=580350749]
+shape = SubResource("RectangleShape2D_272bh")
+
+[node name="Enemy2" type="CharacterBody2D" parent="Enemies" unique_id=410929841]
+position = Vector2(750, 370)
+script = ExtResource("2_0xm2m")
+initial_direction = 1
+
+[node name="Sprite" type="ColorRect" parent="Enemies/Enemy2" unique_id=276001605]
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+color = Color(0.85, 0.3, 0.7, 1)
+
+[node name="FloorRay" type="RayCast2D" parent="Enemies/Enemy2" unique_id=1562525198]
+target_position = Vector2(0, 28)
+
+[node name="CollisionShape" type="CollisionShape2D" parent="Enemies/Enemy2" unique_id=896770598]
+shape = SubResource("RectangleShape2D_5vw27")
