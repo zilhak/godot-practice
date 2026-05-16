@@ -1,5 +1,8 @@
 extends Node2D
 
+signal left_scored
+signal right_scored
+
 @export var speed: float = 420.0
 
 const BALL_SIZE: float = 20.0
@@ -31,6 +34,15 @@ func _process(delta: float) -> void:
 	position += velocity * delta
 	_bounce_off_walls()
 	_bounce_off_paddles()
+	_check_goal()
+
+func _check_goal() -> void:
+	if position.x + BALL_SIZE < 0.0:
+		right_scored.emit()
+		reset_and_launch()
+	elif position.x > VIEWPORT_WIDTH:
+		left_scored.emit()
+		reset_and_launch()
 
 func _bounce_off_paddles() -> void:
 	var ball_rect := Rect2(position, Vector2(BALL_SIZE, BALL_SIZE))

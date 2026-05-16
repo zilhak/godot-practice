@@ -1,9 +1,11 @@
 [gd_scene format=3 uid="uid://b821myv7hqira"]
 
+[ext_resource type="Script" uid="uid://1tox7g6t4vu1" path="res://scripts/main.gd" id="1_h2yge"]
 [ext_resource type="Script" uid="uid://y81y1e2tk5u6" path="res://scripts/paddle.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://b16d7xbiyn535" path="res://scripts/ball.gd" id="2_0xm2m"]
 
 [node name="Main" type="Node2D" unique_id=1797856010]
+script = ExtResource("1_h2yge")
 
 [node name="Background" type="ColorRect" parent="." unique_id=2114960371]
 offset_right = 1152.0
@@ -35,3 +37,12 @@ script = ExtResource("2_0xm2m")
 [node name="Sprite" type="ColorRect" parent="Ball" unique_id=215749440]
 offset_right = 20.0
 offset_bottom = 20.0
+
+[node name="ScoreLabel" type="Label" parent="." unique_id=10014521]
+offset_left = 426.0
+offset_top = 20.0
+offset_right = 726.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 48
+text = "0 : 0"
+horizontal_alignment = 1
