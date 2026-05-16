@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b821myv7hqira"]
 
 [ext_resource type="Script" uid="uid://y81y1e2tk5u6" path="res://scripts/paddle.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://b16d7xbiyn535" path="res://scripts/ball.gd" id="2_0xm2m"]
 
 [node name="Main" type="Node2D" unique_id=1797856010]
 
@@ -26,3 +27,11 @@ down_action = "paddle_right_down"
 [node name="Sprite" type="ColorRect" parent="RightPaddle" unique_id=759764716]
 offset_right = 20.0
 offset_bottom = 100.0
+
+[node name="Ball" type="Node2D" parent="." unique_id=1582782338]
+position = Vector2(566, 314)
+script = ExtResource("2_0xm2m")
+
+[node name="Sprite" type="ColorRect" parent="Ball" unique_id=215749440]
+offset_right = 20.0
+offset_bottom = 20.0
