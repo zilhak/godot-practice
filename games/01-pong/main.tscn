@@ -16,3 +16,13 @@ script = ExtResource("1_ig7tw")
 [node name="Sprite" type="ColorRect" parent="LeftPaddle" unique_id=738163]
 offset_right = 20.0
 offset_bottom = 100.0
+
+[node name="RightPaddle" type="Node2D" parent="." unique_id=2119740797]
+position = Vector2(1092, 274)
+script = ExtResource("1_ig7tw")
+up_action = "paddle_right_up"
+down_action = "paddle_right_down"
+
+[node name="Sprite" type="ColorRect" parent="RightPaddle" unique_id=759764716]
+offset_right = 20.0
+offset_bottom = 100.0
