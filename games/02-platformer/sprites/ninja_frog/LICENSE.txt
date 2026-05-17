@@ -1,0 +1,12 @@
+Source: "Pixel Adventure 1" by Pixel Frog
+URL: https://pixelfrog-assets.itch.io/pixel-adventure-1
+License: Creative Commons Zero v1.0 Universal (CC0)
+        https://creativecommons.org/publicdomain/zero/1.0/
+
+Frames used in this folder:
+- idle.png    (11 frames, 32x32) — Idle (32x32).png
+- run.png     (12 frames, 32x32) — Run (32x32).png
+- jump.png    (1 frame,  32x32) — Jump (32x32).png
+- fall.png    (1 frame,  32x32) — Fall (32x32).png
+- attack.png  (6 frames, 32x32) — Double Jump (32x32).png, reused as spin-attack
+- hit.png     (7 frames, 32x32) — Hit (32x32).png
