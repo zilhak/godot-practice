@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://2rjtpxtho07f" path="res://scripts/player.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://cpxqqhtvhp2en" path="res://scripts/enemy.gd" id="2_0xm2m"]
-[ext_resource type="Texture2D" uid="uid://droatuiiqw6vd" path="res://sprites/player.png" id="2_1bvp3"]
+[ext_resource type="SpriteFrames" path="res://sprites/ninja_frog/player_frames.tres" id="ninja_frames"]
 [ext_resource type="Texture2D" uid="uid://cv0wws7qkx14h" path="res://sprites/slime.png" id="4_lquwl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0xm2m"]
@@ -67,9 +67,11 @@ monitorable = false
 [node name="CollisionShape" type="CollisionShape2D" parent="Player/Hurtbox" unique_id=184378146]
 shape = SubResource("RectangleShape2D_kek77")
 
-[node name="Sprite" type="Sprite2D" parent="Player" unique_id=1715088147]
-scale = Vector2(5, 5)
-texture = ExtResource("2_1bvp3")
+[node name="Sprite" type="AnimatedSprite2D" parent="Player" unique_id=1715088147]
+scale = Vector2(2, 2)
+sprite_frames = ExtResource("ninja_frames")
+animation = &"idle"
+autoplay = "idle"
 
 [node name="Platforms" type="Node2D" parent="." unique_id=391746418]
 

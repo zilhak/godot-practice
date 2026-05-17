@@ -3,7 +3,7 @@ extends CharacterBody2D
 const SPEED: float = 280.0
 const JUMP_VELOCITY: float = -700.0
 const GRAVITY: float = 1400.0
-const ATTACK_DURATION: float = 0.15
+const ATTACK_DURATION: float = 0.33
 const HITBOX_OFFSET: float = 30.0
 
 var facing: int = 1
@@ -13,12 +13,14 @@ var spawn_position: Vector2
 @onready var hitbox: Area2D = $Hitbox
 @onready var hitbox_visual: ColorRect = $Hitbox/Visual
 @onready var hurtbox: Area2D = $Hurtbox
+@onready var sprite: AnimatedSprite2D = $Sprite
 
 func _ready() -> void:
 	spawn_position = position
 	_set_hitbox_active(false)
 	hitbox.body_entered.connect(_on_hitbox_body_entered)
 	hurtbox.body_entered.connect(_on_hurtbox_body_entered)
+	sprite.play("idle")
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
@@ -42,6 +44,28 @@ func _physics_process(delta: float) -> void:
 		_perform_attack()
 
 	move_and_slide()
+	_update_animation(direction)
+
+func _update_animation(direction: float) -> void:
+	sprite.flip_h = facing < 0
+
+	if is_attacking:
+		if sprite.animation != &"attack":
+			sprite.play("attack")
+		return
+
+	if not is_on_floor():
+		var desired: StringName = &"jump" if velocity.y < 0.0 else &"fall"
+		if sprite.animation != desired:
+			sprite.play(desired)
+		return
+
+	if absf(direction) > 0.0:
+		if sprite.animation != &"run":
+			sprite.play("run")
+	else:
+		if sprite.animation != &"idle":
+			sprite.play("idle")
 
 func _perform_attack() -> void:
 	is_attacking = true
@@ -68,3 +92,4 @@ func _die_and_respawn() -> void:
 	position = spawn_position
 	is_attacking = false
 	_set_hitbox_active(false)
+	sprite.play("idle")
