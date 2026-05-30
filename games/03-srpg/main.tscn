@@ -14,10 +14,15 @@ color = Color(0.07, 0.08, 0.12, 1)
 
 [node name="Board" type="Node2D" parent="."]
 position = Vector2(640, 220)
+y_sort_enabled = true
 
 [node name="Grid" type="Node2D" parent="Board"]
 script = ExtResource("2_grid")
 
+[node name="Units" type="Node2D" parent="Board"]
+y_sort_enabled = true
+
 [node name="Cursor" type="Node2D" parent="Board"]
+z_index = 10
 script = ExtResource("3_cursor")
 grid_path = NodePath("../Grid")
