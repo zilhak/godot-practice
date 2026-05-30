@@ -2,27 +2,37 @@ extends Node2D
 
 const UnitScript: Script = preload("res://scripts/unit.gd")
 
-enum State { IDLE, UNIT_SELECTED, MOVING }
+enum State { IDLE, UNIT_SELECTED, MOVING, ENEMY_THINKING }
+enum Phase { PLAYER, ENEMY }
 
 @onready var board: Node2D = $Board
 @onready var grid: Grid = $Board/Grid
 @onready var cursor: Cursor = $Board/Cursor
 @onready var move_overlay: MoveOverlay = $Board/MoveOverlay
 @onready var units_root: Node2D = $Board/Units
+@onready var hud_phase_label: Label = $HUD/PhaseLabel
+@onready var hud_hint_label: Label = $HUD/HintLabel
 
 var units: Array[Unit] = []
 var state: int = State.IDLE
+var phase: int = Phase.PLAYER
+var turn_number: int = 1
 var selected_unit: Unit = null
 var reachable_cells: Array[Vector2i] = []
 var move_parents: Dictionary = {}
 
 func _ready() -> void:
 	_spawn_initial_units()
+	_begin_player_phase()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if state == State.MOVING:
+	if state == State.MOVING or state == State.ENEMY_THINKING:
 		return
-	if event.is_action_pressed("confirm"):
+	if phase != Phase.PLAYER:
+		return
+	if event.is_action_pressed("end_turn"):
+		_end_player_phase()
+	elif event.is_action_pressed("confirm"):
 		_on_confirm()
 	elif event.is_action_pressed("cancel"):
 		_on_cancel()
@@ -91,6 +101,61 @@ func _on_move_finished() -> void:
 	reachable_cells = []
 	move_parents = {}
 	state = State.IDLE
+	_check_phase_end()
+
+func _check_phase_end() -> void:
+	if phase == Phase.PLAYER and _all_acted(Unit.Team.PLAYER):
+		_end_player_phase()
+	elif phase == Phase.ENEMY and _all_acted(Unit.Team.ENEMY):
+		_end_enemy_phase()
+
+func _all_acted(team: int) -> bool:
+	for u in units:
+		if u.team == team and not u.has_acted:
+			return false
+	return true
+
+func _team_units(team: int) -> Array[Unit]:
+	var out: Array[Unit] = []
+	for u in units:
+		if u.team == team:
+			out.append(u)
+	return out
+
+func _begin_player_phase() -> void:
+	phase = Phase.PLAYER
+	state = State.IDLE
+	for u in units:
+		u.clear_acted()
+	_update_hud()
+
+func _end_player_phase() -> void:
+	if state == State.UNIT_SELECTED:
+		_deselect_unit()
+	_begin_enemy_phase()
+
+func _begin_enemy_phase() -> void:
+	phase = Phase.ENEMY
+	state = State.ENEMY_THINKING
+	for u in units:
+		u.clear_acted()
+	_update_hud()
+	# 자리표시자: 진짜 AI는 task #9. 일단 모두 행동완료 처리하고 페이즈 넘김.
+	await get_tree().create_timer(0.4).timeout
+	for u in _team_units(Unit.Team.ENEMY):
+		u.mark_acted()
+	_end_enemy_phase()
+
+func _end_enemy_phase() -> void:
+	turn_number += 1
+	_begin_player_phase()
+
+func _update_hud() -> void:
+	if hud_phase_label == null:
+		return
+	var phase_text := "Player Phase" if phase == Phase.PLAYER else "Enemy Phase"
+	hud_phase_label.text = "Turn %d — %s" % [turn_number, phase_text]
+	hud_hint_label.text = "Space:선택/확정  Esc:취소  F6:턴 종료"
 
 func _build_path(from: Vector2i, to: Vector2i) -> Array:
 	var rev: Array = [to]
