@@ -189,11 +189,57 @@ func _begin_enemy_phase() -> void:
 	for u in units:
 		u.clear_acted()
 	_update_hud()
-	# 자리표시자: 진짜 AI는 task #9. 일단 모두 행동완료 처리하고 페이즈 넘김.
-	await get_tree().create_timer(0.4).timeout
-	for u in _team_units(Unit.Team.ENEMY):
-		u.mark_acted()
+	await _run_enemy_turns()
 	_end_enemy_phase()
+
+func _run_enemy_turns() -> void:
+	for enemy in _team_units(Unit.Team.ENEMY):
+		if not is_instance_valid(enemy):
+			continue
+		await get_tree().create_timer(0.3).timeout
+		await _ai_take_turn(enemy)
+		if is_instance_valid(enemy):
+			enemy.mark_acted()
+
+func _ai_take_turn(enemy: Unit) -> void:
+	var targets := _team_units(Unit.Team.PLAYER)
+	if targets.is_empty():
+		return
+
+	var r := _bfs_reachable(enemy)
+	var reach: Array = r.cells
+	var parents: Dictionary = r.parents
+
+	# 이동 후 가장 가까운 아군과의 맨해튼 거리가 최소가 되는 셀.
+	# 동률이면 출발 셀에서의 BFS 거리가 짧은 쪽 (이동 적게).
+	var best_cell: Vector2i = enemy.cell
+	var best_score: int = 1_000_000
+	for c in reach:
+		var nearest_d: int = 1_000_000
+		for t in targets:
+			var d: int = absi(c.x - t.cell.x) + absi(c.y - t.cell.y)
+			if d < nearest_d:
+				nearest_d = d
+		var move_cost: int = _build_path_with(parents, enemy.cell, c).size() - 1
+		var score: int = nearest_d * 100 + move_cost
+		if score < best_score:
+			best_score = score
+			best_cell = c
+
+	if best_cell != enemy.cell:
+		var path := _build_path_with(parents, enemy.cell, best_cell)
+		enemy.move_along(path)
+		await enemy.move_finished
+
+	# 인접 아군 공격
+	for d in [Vector2i.RIGHT, Vector2i.LEFT, Vector2i.DOWN, Vector2i.UP]:
+		var c: Vector2i = enemy.cell + d
+		var v := unit_at(c)
+		if v != null and v.team == Unit.Team.PLAYER:
+			v.take_damage(enemy.attack_power)
+			if v.hp == 0:
+				units.erase(v)
+			break
 
 func _end_enemy_phase() -> void:
 	turn_number += 1
@@ -207,22 +253,19 @@ func _update_hud() -> void:
 	hud_hint_label.text = "Space:선택/확정  Esc:취소  F6:턴 종료"
 
 func _build_path(from: Vector2i, to: Vector2i) -> Array:
-	var rev: Array = [to]
-	var cur := to
-	while cur != from:
-		if not move_parents.has(cur):
-			break
-		cur = move_parents[cur]
-		rev.append(cur)
-	rev.reverse()
-	return rev
+	return _build_path_with(move_parents, from, to)
 
 # 4방향 BFS — 이동력만큼 이동 가능한 셀 집합 (시작 셀 포함).
 # 다른 유닛이 점유한 셀은 통과 불가, 단 시작 셀의 본인은 무시.
 # 결과는 reachable_cells와 move_parents (셀 → 부모셀) 에 저장.
 func _compute_reachable(unit: Unit) -> void:
-	reachable_cells = []
-	move_parents = {}
+	var r := _bfs_reachable(unit)
+	reachable_cells = r.cells
+	move_parents = r.parents
+
+func _bfs_reachable(unit: Unit) -> Dictionary:
+	var cells: Array[Vector2i] = []
+	var parents: Dictionary = {}
 	var visited: Dictionary = {}
 	var blocked: Dictionary = {}
 	for other in units:
@@ -231,7 +274,7 @@ func _compute_reachable(unit: Unit) -> void:
 
 	var queue: Array = [[unit.cell, 0]]
 	visited[unit.cell] = true
-	reachable_cells.append(unit.cell)
+	cells.append(unit.cell)
 
 	while not queue.is_empty():
 		var head: Array = queue.pop_front()
@@ -248,6 +291,18 @@ func _compute_reachable(unit: Unit) -> void:
 			if blocked.has(n):
 				continue
 			visited[n] = true
-			move_parents[n] = cur
-			reachable_cells.append(n)
+			parents[n] = cur
+			cells.append(n)
 			queue.push_back([n, dist + 1])
+	return {"cells": cells, "parents": parents}
+
+func _build_path_with(parents: Dictionary, from: Vector2i, to: Vector2i) -> Array:
+	var rev: Array = [to]
+	var cur := to
+	while cur != from:
+		if not parents.has(cur):
+			break
+		cur = parents[cur]
+		rev.append(cur)
+	rev.reverse()
+	return rev
