@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://b03srpg00001"]
+[gd_scene load_steps=4 format=3 uid="uid://b03srpg00001"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/grid.gd" id="2_grid"]
+[ext_resource type="Script" path="res://scripts/cursor.gd" id="3_cursor"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -16,3 +17,7 @@ position = Vector2(640, 220)
 
 [node name="Grid" type="Node2D" parent="Board"]
 script = ExtResource("2_grid")
+
+[node name="Cursor" type="Node2D" parent="Board"]
+script = ExtResource("3_cursor")
+grid_path = NodePath("../Grid")
