@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://b03srpg00001"]
+[gd_scene load_steps=3 format=3 uid="uid://b03srpg00001"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/grid.gd" id="2_grid"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -9,3 +10,9 @@ script = ExtResource("1_main")
 offset_right = 1280.0
 offset_bottom = 720.0
 color = Color(0.07, 0.08, 0.12, 1)
+
+[node name="Board" type="Node2D" parent="."]
+position = Vector2(640, 220)
+
+[node name="Grid" type="Node2D" parent="Board"]
+script = ExtResource("2_grid")
