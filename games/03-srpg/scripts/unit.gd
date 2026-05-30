@@ -11,11 +11,15 @@ enum Team { PLAYER, ENEMY }
 @export var attack_power: int = 3
 
 var hp: int = 10
+var has_acted: bool = false
 
 const BODY_W: float = 28.0
 const BODY_H: float = 38.0
+const MOVE_TIME_PER_STEP: float = 0.12
 
 var grid: Grid
+
+signal move_finished
 
 func _ready() -> void:
 	hp = max_hp
@@ -31,9 +35,37 @@ func _snap_to_cell() -> void:
 	queue_redraw()
 
 func team_color() -> Color:
+	var base: Color
 	if team == Team.PLAYER:
-		return Color(0.35, 0.55, 0.95)
-	return Color(0.9, 0.35, 0.35)
+		base = Color(0.35, 0.55, 0.95)
+	else:
+		base = Color(0.9, 0.35, 0.35)
+	if has_acted:
+		return base.darkened(0.45)
+	return base
+
+func mark_acted() -> void:
+	has_acted = true
+	queue_redraw()
+
+func clear_acted() -> void:
+	has_acted = false
+	queue_redraw()
+
+func move_along(path: Array) -> void:
+	if path.size() <= 1:
+		return
+	var tween := create_tween()
+	for i in range(1, path.size()):
+		var next_cell: Vector2i = path[i]
+		var target := grid.grid_to_local(next_cell)
+		tween.tween_property(self, "position", target, MOVE_TIME_PER_STEP)
+	tween.tween_callback(_on_move_done.bind(path[path.size() - 1]))
+
+func _on_move_done(final_cell: Vector2i) -> void:
+	cell = final_cell
+	mark_acted()
+	move_finished.emit()
 
 func _draw() -> void:
 	# 본체: 셀 중앙 위에 세워둔 직사각형 (발은 셀 중앙)
