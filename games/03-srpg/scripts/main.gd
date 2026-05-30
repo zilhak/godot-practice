@@ -2,7 +2,7 @@ extends Node2D
 
 const UnitScript: Script = preload("res://scripts/unit.gd")
 
-enum State { IDLE, UNIT_SELECTED, MOVING, AWAITING_ATTACK, ENEMY_THINKING }
+enum State { IDLE, UNIT_SELECTED, MOVING, AWAITING_ATTACK, ENEMY_THINKING, GAME_OVER }
 enum Phase { PLAYER, ENEMY }
 
 @onready var board: Node2D = $Board
@@ -13,6 +13,9 @@ enum Phase { PLAYER, ENEMY }
 @onready var units_root: Node2D = $Board/Units
 @onready var hud_phase_label: Label = $HUD/PhaseLabel
 @onready var hud_hint_label: Label = $HUD/HintLabel
+@onready var result_panel: Control = $HUD/ResultPanel
+@onready var result_title: Label = $HUD/ResultPanel/Title
+@onready var result_hint: Label = $HUD/ResultPanel/Hint
 
 var units: Array[Unit] = []
 var state: int = State.IDLE
@@ -29,6 +32,10 @@ func _ready() -> void:
 	_begin_player_phase()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if state == State.GAME_OVER:
+		if event.is_action_pressed("confirm"):
+			get_tree().reload_current_scene()
+		return
 	if state == State.MOVING or state == State.ENEMY_THINKING:
 		return
 	if phase != Phase.PLAYER:
@@ -150,6 +157,8 @@ func _finish_action() -> void:
 		pending_unit.mark_acted()
 	pending_unit = null
 	state = State.IDLE
+	if _check_game_end():
+		return
 	_check_phase_end()
 
 func _check_phase_end() -> void:
@@ -190,6 +199,8 @@ func _begin_enemy_phase() -> void:
 		u.clear_acted()
 	_update_hud()
 	await _run_enemy_turns()
+	if state == State.GAME_OVER:
+		return
 	_end_enemy_phase()
 
 func _run_enemy_turns() -> void:
@@ -200,6 +211,8 @@ func _run_enemy_turns() -> void:
 		await _ai_take_turn(enemy)
 		if is_instance_valid(enemy):
 			enemy.mark_acted()
+		if _check_game_end():
+			return
 
 func _ai_take_turn(enemy: Unit) -> void:
 	var targets := _team_units(Unit.Team.PLAYER)
@@ -244,6 +257,27 @@ func _ai_take_turn(enemy: Unit) -> void:
 func _end_enemy_phase() -> void:
 	turn_number += 1
 	_begin_player_phase()
+
+func _check_game_end() -> bool:
+	var players_alive: int = _team_units(Unit.Team.PLAYER).size()
+	var enemies_alive: int = _team_units(Unit.Team.ENEMY).size()
+	if enemies_alive == 0:
+		_show_result(true)
+		return true
+	if players_alive == 0:
+		_show_result(false)
+		return true
+	return false
+
+func _show_result(victory: bool) -> void:
+	state = State.GAME_OVER
+	if result_panel == null:
+		return
+	result_title.text = "VICTORY" if victory else "DEFEAT"
+	result_title.add_theme_color_override("font_color",
+		Color(0.95, 0.85, 0.3) if victory else Color(0.95, 0.4, 0.4))
+	result_hint.text = "Press Space / Enter to restart"
+	result_panel.visible = true
 
 func _update_hud() -> void:
 	if hud_phase_label == null:

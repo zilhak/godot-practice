@@ -56,3 +56,40 @@ offset_bottom = 78.0
 theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 1)
 theme_override_font_sizes/font_size = 14
 text = "Space:선택/확정  Esc:취소  F6:턴 종료"
+
+[node name="ResultPanel" type="Control" parent="HUD"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Backdrop" type="ColorRect" parent="HUD/ResultPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.55)
+
+[node name="Title" type="Label" parent="HUD/ResultPanel"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -80.0
+offset_right = 240.0
+offset_bottom = 0.0
+theme_override_font_sizes/font_size = 72
+horizontal_alignment = 1
+text = "VICTORY"
+
+[node name="Hint" type="Label" parent="HUD/ResultPanel"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = 30.0
+offset_right = 300.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+text = "Press Space / Enter to restart"
