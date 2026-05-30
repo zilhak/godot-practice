@@ -13,6 +13,8 @@ enum Team { PLAYER, ENEMY }
 var hp: int = 10
 var has_acted: bool = false
 
+signal died
+
 const BODY_W: float = 28.0
 const BODY_H: float = 38.0
 const MOVE_TIME_PER_STEP: float = 0.12
@@ -64,8 +66,14 @@ func move_along(path: Array) -> void:
 
 func _on_move_done(final_cell: Vector2i) -> void:
 	cell = final_cell
-	mark_acted()
 	move_finished.emit()
+
+func take_damage(amount: int) -> void:
+	hp = max(0, hp - amount)
+	queue_redraw()
+	if hp == 0:
+		died.emit()
+		queue_free()
 
 func _draw() -> void:
 	# 본체: 셀 중앙 위에 세워둔 직사각형 (발은 셀 중앙)

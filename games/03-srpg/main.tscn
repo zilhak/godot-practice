@@ -24,6 +24,12 @@ script = ExtResource("2_grid")
 script = ExtResource("4_overlay")
 grid_path = NodePath("../Grid")
 
+[node name="AttackOverlay" type="Node2D" parent="Board"]
+script = ExtResource("4_overlay")
+grid_path = NodePath("../Grid")
+color = Color(1.0, 0.3, 0.3, 0.4)
+border_color = Color(1.0, 0.5, 0.5, 0.95)
+
 [node name="Units" type="Node2D" parent="Board"]
 y_sort_enabled = true
 

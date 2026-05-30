@@ -2,13 +2,14 @@ extends Node2D
 
 const UnitScript: Script = preload("res://scripts/unit.gd")
 
-enum State { IDLE, UNIT_SELECTED, MOVING, ENEMY_THINKING }
+enum State { IDLE, UNIT_SELECTED, MOVING, AWAITING_ATTACK, ENEMY_THINKING }
 enum Phase { PLAYER, ENEMY }
 
 @onready var board: Node2D = $Board
 @onready var grid: Grid = $Board/Grid
 @onready var cursor: Cursor = $Board/Cursor
 @onready var move_overlay: MoveOverlay = $Board/MoveOverlay
+@onready var attack_overlay: MoveOverlay = $Board/AttackOverlay
 @onready var units_root: Node2D = $Board/Units
 @onready var hud_phase_label: Label = $HUD/PhaseLabel
 @onready var hud_hint_label: Label = $HUD/HintLabel
@@ -20,6 +21,8 @@ var turn_number: int = 1
 var selected_unit: Unit = null
 var reachable_cells: Array[Vector2i] = []
 var move_parents: Dictionary = {}
+var attack_targets: Array[Vector2i] = []
+var pending_unit: Unit = null
 
 func _ready() -> void:
 	_spawn_initial_units()
@@ -70,10 +73,17 @@ func _on_confirm() -> void:
 	elif state == State.UNIT_SELECTED:
 		if cursor.cell in reachable_cells:
 			_commit_move(cursor.cell)
+	elif state == State.AWAITING_ATTACK:
+		if cursor.cell in attack_targets:
+			_commit_attack(cursor.cell)
+		elif cursor.cell == pending_unit.cell:
+			_finish_action()
 
 func _on_cancel() -> void:
 	if state == State.UNIT_SELECTED:
 		_deselect_unit()
+	elif state == State.AWAITING_ATTACK:
+		_finish_action()
 
 func _select_unit(u: Unit) -> void:
 	selected_unit = u
@@ -89,17 +99,56 @@ func _deselect_unit() -> void:
 	move_overlay.clear()
 
 func _commit_move(target: Vector2i) -> void:
-	var path := _build_path(selected_unit.cell, target)
-	state = State.MOVING
 	move_overlay.clear()
+	if target == selected_unit.cell:
+		_on_move_finished()
+		return
+	state = State.MOVING
 	var u := selected_unit
 	u.move_finished.connect(_on_move_finished, CONNECT_ONE_SHOT)
-	u.move_along(path)
+	u.move_along(_build_path(u.cell, target))
 
 func _on_move_finished() -> void:
+	pending_unit = selected_unit
 	selected_unit = null
 	reachable_cells = []
 	move_parents = {}
+	_enter_attack_selection()
+
+func _enter_attack_selection() -> void:
+	attack_targets = _find_attack_targets(pending_unit)
+	if attack_targets.is_empty():
+		_finish_action()
+		return
+	state = State.AWAITING_ATTACK
+	attack_overlay.set_cells(attack_targets)
+	cursor.cell = attack_targets[0]
+	cursor._snap_to_cell()
+
+func _find_attack_targets(unit: Unit) -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	for d in [Vector2i.RIGHT, Vector2i.LEFT, Vector2i.DOWN, Vector2i.UP]:
+		var c: Vector2i = unit.cell + d
+		var v := unit_at(c)
+		if v != null and v.team != unit.team:
+			out.append(c)
+	return out
+
+func _commit_attack(target_cell: Vector2i) -> void:
+	var target := unit_at(target_cell)
+	if target == null:
+		return
+	target.take_damage(pending_unit.attack_power)
+	if target.hp == 0:
+		units.erase(target)
+	_finish_action()
+
+func _finish_action() -> void:
+	attack_targets = []
+	attack_overlay.clear()
+	if pending_unit != null and is_instance_valid(pending_unit):
+		pending_unit.mark_acted()
+	pending_unit = null
 	state = State.IDLE
 	_check_phase_end()
 
