@@ -2,7 +2,7 @@ extends Node2D
 
 const UnitScript: Script = preload("res://scripts/unit.gd")
 
-enum State { IDLE, UNIT_SELECTED, MOVING, AWAITING_ATTACK, ENEMY_THINKING, GAME_OVER }
+enum State { IDLE, UNIT_SELECTED, MOVING, AWAITING_ACTION, AWAITING_ATTACK, ENEMY_THINKING, GAME_OVER }
 enum Phase { PLAYER, ENEMY }
 
 @onready var board: Node2D = $Board
@@ -13,6 +13,9 @@ enum Phase { PLAYER, ENEMY }
 @onready var units_root: Node2D = $Board/Units
 @onready var hud_phase_label: Label = $HUD/PhaseLabel
 @onready var hud_hint_label: Label = $HUD/HintLabel
+@onready var action_menu: PanelContainer = $HUD/ActionMenu
+@onready var attack_button: Button = $HUD/ActionMenu/VBox/AttackButton
+@onready var wait_button: Button = $HUD/ActionMenu/VBox/WaitButton
 @onready var result_panel: Control = $HUD/ResultPanel
 @onready var result_title: Label = $HUD/ResultPanel/Title
 @onready var result_hint: Label = $HUD/ResultPanel/Hint
@@ -30,6 +33,8 @@ var pending_unit: Unit = null
 var pending_attack_cell: Vector2i = Vector2i(-1, -1)
 
 func _ready() -> void:
+	attack_button.pressed.connect(_on_attack_button_pressed)
+	wait_button.pressed.connect(_on_wait_button_pressed)
 	_spawn_initial_units()
 	_begin_player_phase()
 
@@ -39,6 +44,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_tree().reload_current_scene()
 		return
 	if state == State.MOVING or state == State.ENEMY_THINKING:
+		return
+	if state == State.AWAITING_ACTION:
+		if event.is_action_pressed("cancel"):
+			_on_wait_button_pressed()
 		return
 	if phase != Phase.PLAYER:
 		return
@@ -180,7 +189,50 @@ func _on_move_finished() -> void:
 		pending_attack_cell = Vector2i(-1, -1)
 		_commit_attack(target_cell)
 		return
+	_show_action_menu()
+
+func _show_action_menu() -> void:
+	attack_targets = _find_attack_targets(pending_unit)
+	state = State.AWAITING_ACTION
+	attack_button.disabled = attack_targets.is_empty()
+	_position_action_menu()
+	action_menu.visible = true
+	if not attack_button.disabled:
+		attack_button.grab_focus()
+	else:
+		wait_button.grab_focus()
+
+func _position_action_menu() -> void:
+	# 메뉴 크기가 아직 0일 수 있으므로 한 프레임 대기 후 위치 보정.
+	action_menu.position = Vector2.ZERO
+	action_menu.reset_size()
+	var unit_screen: Vector2 = board.global_position + grid.grid_to_local(pending_unit.cell)
+	var menu_size: Vector2 = action_menu.size
+	if menu_size == Vector2.ZERO:
+		menu_size = Vector2(140, 80)
+	var target: Vector2 = unit_screen + Vector2(Grid.TILE_W / 2.0 + 8.0, -menu_size.y / 2.0)
+	var vp: Vector2 = get_viewport_rect().size
+	# 오른쪽 화면 밖이면 유닛 왼쪽으로 띄움.
+	if target.x + menu_size.x > vp.x - 8.0:
+		target.x = unit_screen.x - Grid.TILE_W / 2.0 - 8.0 - menu_size.x
+	target.x = clampf(target.x, 8.0, vp.x - menu_size.x - 8.0)
+	target.y = clampf(target.y, 8.0, vp.y - menu_size.y - 8.0)
+	action_menu.position = target
+
+func _hide_action_menu() -> void:
+	action_menu.visible = false
+
+func _on_attack_button_pressed() -> void:
+	if state != State.AWAITING_ACTION:
+		return
+	_hide_action_menu()
 	_enter_attack_selection()
+
+func _on_wait_button_pressed() -> void:
+	if state != State.AWAITING_ACTION:
+		return
+	_hide_action_menu()
+	_finish_action()
 
 func _enter_attack_selection() -> void:
 	attack_targets = _find_attack_targets(pending_unit)
@@ -218,6 +270,7 @@ func _finish_action() -> void:
 	attack_targets = []
 	pending_attack_cell = Vector2i(-1, -1)
 	attack_overlay.clear()
+	_hide_action_menu()
 	if pending_unit != null and is_instance_valid(pending_unit):
 		pending_unit.mark_acted()
 	pending_unit = null

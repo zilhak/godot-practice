@@ -58,6 +58,20 @@ theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 1)
 theme_override_font_sizes/font_size = 14
 text = "좌클릭/Space:선택·확정   우클릭/Esc:취소   F6:턴 종료"
 
+[node name="ActionMenu" type="PanelContainer" parent="HUD"]
+visible = false
+mouse_filter = 1
+
+[node name="VBox" type="VBoxContainer" parent="HUD/ActionMenu"]
+
+[node name="AttackButton" type="Button" parent="HUD/ActionMenu/VBox"]
+custom_minimum_size = Vector2(120, 32)
+text = "공격"
+
+[node name="WaitButton" type="Button" parent="HUD/ActionMenu/VBox"]
+custom_minimum_size = Vector2(120, 32)
+text = "대기"
+
 [node name="ResultPanel" type="Control" parent="HUD" unique_id=1885442079]
 visible = false
 layout_mode = 3
