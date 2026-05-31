@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/trooper_data.gd" id="1_1mphv"]
+[ext_resource type="Resource" path="res://data/classes/warrior.tres" id="2_56wbe"]
+[ext_resource type="Script" path="res://scripts/data/character_data.gd" id="3_cnh8p"]
+
+[sub_resource type="Resource" id="Resource_7ls25"]
+script = ExtResource("1_1mphv")
+class_data = ExtResource("2_56wbe")
+
+[sub_resource type="Resource" id="Resource_mjci8"]
+script = ExtResource("1_1mphv")
+class_data = ExtResource("2_56wbe")
+
+[sub_resource type="Resource" id="Resource_f4xha"]
+script = ExtResource("1_1mphv")
+class_data = ExtResource("2_56wbe")
+
+[sub_resource type="Resource" id="Resource_goij0"]
+script = ExtResource("1_1mphv")
+class_data = ExtResource("2_56wbe")
+
+[sub_resource type="Resource" id="Resource_6tkg0"]
+script = ExtResource("1_1mphv")
+class_data = ExtResource("2_56wbe")
+
+[sub_resource type="Resource" id="Resource_v40uk"]
+script = ExtResource("1_1mphv")
+class_data = ExtResource("2_56wbe")
+
+[sub_resource type="Resource" id="Resource_g54fi"]
+script = ExtResource("1_1mphv")
+class_data = ExtResource("2_56wbe")
+
+[sub_resource type="Resource" id="Resource_ujli4"]
+script = ExtResource("1_1mphv")
+class_data = ExtResource("2_56wbe")
+
+[sub_resource type="Resource" id="Resource_k1phn"]
+script = ExtResource("1_1mphv")
+class_data = ExtResource("2_56wbe")
+
+[resource]
+script = ExtResource("3_cnh8p")
+id = &"test1"
+display_name = "test1"
+base_formation = Array[ExtResource("1_1mphv")]([SubResource("Resource_7ls25"), SubResource("Resource_mjci8"), SubResource("Resource_f4xha"), SubResource("Resource_goij0"), SubResource("Resource_6tkg0"), SubResource("Resource_v40uk"), SubResource("Resource_g54fi"), SubResource("Resource_ujli4"), SubResource("Resource_k1phn")])

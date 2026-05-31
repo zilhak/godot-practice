@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/trooper_data.gd" id="1_crkhi"]
+[ext_resource type="Resource" path="res://data/classes/warrior.tres" id="2_o205a"]
+[ext_resource type="Script" path="res://scripts/data/character_data.gd" id="3_wlpus"]
+
+[sub_resource type="Resource" id="Resource_7wi2e"]
+script = ExtResource("1_crkhi")
+class_data = ExtResource("2_o205a")
+
+[sub_resource type="Resource" id="Resource_mqduo"]
+script = ExtResource("1_crkhi")
+class_data = ExtResource("2_o205a")
+
+[sub_resource type="Resource" id="Resource_4wilg"]
+script = ExtResource("1_crkhi")
+class_data = ExtResource("2_o205a")
+
+[sub_resource type="Resource" id="Resource_cash6"]
+script = ExtResource("1_crkhi")
+class_data = ExtResource("2_o205a")
+
+[sub_resource type="Resource" id="Resource_roi5d"]
+script = ExtResource("1_crkhi")
+class_data = ExtResource("2_o205a")
+
+[sub_resource type="Resource" id="Resource_f1p38"]
+script = ExtResource("1_crkhi")
+class_data = ExtResource("2_o205a")
+
+[sub_resource type="Resource" id="Resource_e1eql"]
+script = ExtResource("1_crkhi")
+class_data = ExtResource("2_o205a")
+
+[sub_resource type="Resource" id="Resource_deii8"]
+script = ExtResource("1_crkhi")
+class_data = ExtResource("2_o205a")
+
+[sub_resource type="Resource" id="Resource_w7gkc"]
+script = ExtResource("1_crkhi")
+class_data = ExtResource("2_o205a")
+
+[resource]
+script = ExtResource("3_wlpus")
+id = &"test_enemy1"
+display_name = "test_enemy1"
+base_formation = Array[ExtResource("1_crkhi")]([SubResource("Resource_7wi2e"), SubResource("Resource_mqduo"), SubResource("Resource_4wilg"), SubResource("Resource_cash6"), SubResource("Resource_roi5d"), SubResource("Resource_f1p38"), SubResource("Resource_e1eql"), SubResource("Resource_deii8"), SubResource("Resource_w7gkc")])

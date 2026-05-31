@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/trooper_data.gd" id="1_4djh6"]
+[ext_resource type="Resource" path="res://data/classes/warrior.tres" id="2_vsyb5"]
+[ext_resource type="Script" path="res://scripts/data/character_data.gd" id="3_kd6vh"]
+
+[sub_resource type="Resource" id="Resource_t3th6"]
+script = ExtResource("1_4djh6")
+class_data = ExtResource("2_vsyb5")
+
+[sub_resource type="Resource" id="Resource_8edwo"]
+script = ExtResource("1_4djh6")
+class_data = ExtResource("2_vsyb5")
+
+[sub_resource type="Resource" id="Resource_d26nc"]
+script = ExtResource("1_4djh6")
+class_data = ExtResource("2_vsyb5")
+
+[sub_resource type="Resource" id="Resource_tqpph"]
+script = ExtResource("1_4djh6")
+class_data = ExtResource("2_vsyb5")
+
+[sub_resource type="Resource" id="Resource_ulavp"]
+script = ExtResource("1_4djh6")
+class_data = ExtResource("2_vsyb5")
+
+[sub_resource type="Resource" id="Resource_dma68"]
+script = ExtResource("1_4djh6")
+class_data = ExtResource("2_vsyb5")
+
+[sub_resource type="Resource" id="Resource_abfe3"]
+script = ExtResource("1_4djh6")
+class_data = ExtResource("2_vsyb5")
+
+[sub_resource type="Resource" id="Resource_5tf3h"]
+script = ExtResource("1_4djh6")
+class_data = ExtResource("2_vsyb5")
+
+[sub_resource type="Resource" id="Resource_g868s"]
+script = ExtResource("1_4djh6")
+class_data = ExtResource("2_vsyb5")
+
+[resource]
+script = ExtResource("3_kd6vh")
+id = &"test2"
+display_name = "test2"
+base_formation = Array[ExtResource("1_4djh6")]([SubResource("Resource_t3th6"), SubResource("Resource_8edwo"), SubResource("Resource_d26nc"), SubResource("Resource_tqpph"), SubResource("Resource_ulavp"), SubResource("Resource_dma68"), SubResource("Resource_abfe3"), SubResource("Resource_5tf3h"), SubResource("Resource_g868s")])
