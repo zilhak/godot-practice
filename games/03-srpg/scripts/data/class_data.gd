@@ -13,6 +13,9 @@ enum AttackType { MELEE, RANGED, MAGIC }
 @export var base_max_hp: int = 10
 @export var base_atk: int = 3
 @export var base_def: int = 0
+@export var base_hit: int = 100      # 명중 (100 기준)
+@export var base_evasion: int = 0    # 회피
+@export var base_crit_rate: int = 0  # 치명타율 (%) 0~100
 
 @export_group("Combat")
 @export var attack_type: AttackType = AttackType.MELEE

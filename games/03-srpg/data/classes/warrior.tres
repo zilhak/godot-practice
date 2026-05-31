@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ClassData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/class_data.gd" id="1_class"]
+
+[resource]
+script = ExtResource("1_class")
+id = &"warrior"
+display_name = "전사"
+base_max_hp = 500
+base_atk = 250
+base_def = 40
+base_hit = 100
+base_evasion = 110
+base_crit_rate = 10
+attack_type = 0
+attack_range = 1
+hp_per_level = 0
+atk_per_level = 0
+def_per_level = 0

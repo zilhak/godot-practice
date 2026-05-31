@@ -30,3 +30,18 @@ func get_defense() -> int:
 		return 0
 	var v: int = class_data.base_def + class_data.def_per_level * (level - 1)
 	return v + int(modifiers.get("def_bonus", 0))
+
+func get_hit() -> int:
+	if class_data == null:
+		return 0
+	return class_data.base_hit + int(modifiers.get("hit_bonus", 0))
+
+func get_evasion() -> int:
+	if class_data == null:
+		return 0
+	return class_data.base_evasion + int(modifiers.get("evasion_bonus", 0))
+
+func get_crit_rate() -> int:
+	if class_data == null:
+		return 0
+	return class_data.base_crit_rate + int(modifiers.get("crit_bonus", 0))
