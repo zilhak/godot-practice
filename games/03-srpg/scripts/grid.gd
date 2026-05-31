@@ -17,11 +17,16 @@ func grid_to_local(cell: Vector2i) -> Vector2:
 	return Vector2(x, y)
 
 func local_to_grid(local_pos: Vector2) -> Vector2i:
-	var gx := local_pos.x / (TILE_W / 2.0)
-	var gy := local_pos.y / (TILE_H / 2.0)
-	var cx := int(floor((gx + gy) / 2.0))
-	var cy := int(floor((gy - gx) / 2.0))
-	return Vector2i(cx, cy)
+	# 아이소 좌표 역변환:
+	# screen_x = (cx - cy) * TILE_W/2,  screen_y = (cx + cy) * TILE_H/2
+	# u = screen_x / (TILE_W/2),  v = screen_y / (TILE_H/2)
+	# cx = (u + v) / 2,  cy = (v - u) / 2
+	# 다이아몬드 셀에 정확히 매핑되도록 round 사용.
+	var u: float = local_pos.x / (TILE_W / 2.0)
+	var v: float = local_pos.y / (TILE_H / 2.0)
+	var cx: float = (u + v) / 2.0
+	var cy: float = (v - u) / 2.0
+	return Vector2i(roundi(cx), roundi(cy))
 
 func in_bounds(cell: Vector2i) -> bool:
 	return cell.x >= 0 and cell.x < cols and cell.y >= 0 and cell.y < rows

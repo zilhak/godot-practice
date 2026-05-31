@@ -35,7 +35,7 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if state == State.GAME_OVER:
-		if event.is_action_pressed("confirm"):
+		if event.is_action_pressed("confirm") or _is_mouse_left_pressed(event):
 			get_tree().reload_current_scene()
 		return
 	if state == State.MOVING or state == State.ENEMY_THINKING:
@@ -44,10 +44,20 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("end_turn"):
 		_end_player_phase()
-	elif event.is_action_pressed("confirm"):
+	elif event.is_action_pressed("confirm") or _is_mouse_left_pressed(event):
 		_on_confirm()
-	elif event.is_action_pressed("cancel"):
+	elif event.is_action_pressed("cancel") or _is_mouse_right_pressed(event):
 		_on_cancel()
+
+func _is_mouse_left_pressed(event: InputEvent) -> bool:
+	return event is InputEventMouseButton \
+		and event.button_index == MOUSE_BUTTON_LEFT \
+		and event.pressed
+
+func _is_mouse_right_pressed(event: InputEvent) -> bool:
+	return event is InputEventMouseButton \
+		and event.button_index == MOUSE_BUTTON_RIGHT \
+		and event.pressed
 
 func _spawn_initial_units() -> void:
 	_spawn_unit("Knight", Unit.Team.PLAYER, Vector2i(0, 7), 12, 4, 4)
@@ -339,7 +349,7 @@ func _update_hud() -> void:
 		return
 	var phase_text := "Player Phase" if phase == Phase.PLAYER else "Enemy Phase"
 	hud_phase_label.text = "Turn %d — %s" % [turn_number, phase_text]
-	hud_hint_label.text = "Space:선택/확정  Esc:취소  F6:턴 종료"
+	hud_hint_label.text = "좌클릭/Space:선택·확정   우클릭/Esc:취소   F6:턴 종료"
 
 func _build_path(from: Vector2i, to: Vector2i) -> Array:
 	return _build_path_with(move_parents, from, to)
