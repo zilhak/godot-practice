@@ -25,7 +25,9 @@ var selected_unit: Unit = null
 var reachable_cells: Array[Vector2i] = []
 var move_parents: Dictionary = {}
 var attack_targets: Array[Vector2i] = []
+var attackable_enemy_cells: Array[Vector2i] = []
 var pending_unit: Unit = null
+var pending_attack_cell: Vector2i = Vector2i(-1, -1)
 
 func _ready() -> void:
 	_spawn_initial_units()
@@ -80,6 +82,8 @@ func _on_confirm() -> void:
 	elif state == State.UNIT_SELECTED:
 		if cursor.cell in reachable_cells:
 			_commit_move(cursor.cell)
+		elif cursor.cell in attackable_enemy_cells:
+			_commit_move_then_attack(cursor.cell)
 	elif state == State.AWAITING_ATTACK:
 		if cursor.cell in attack_targets:
 			_commit_attack(cursor.cell)
@@ -96,17 +100,37 @@ func _select_unit(u: Unit) -> void:
 	selected_unit = u
 	state = State.UNIT_SELECTED
 	_compute_reachable(u)
+	_compute_attackable_enemies(u)
 	move_overlay.set_cells(reachable_cells)
+	attack_overlay.set_cells(attackable_enemy_cells)
 
 func _deselect_unit() -> void:
 	selected_unit = null
 	state = State.IDLE
 	reachable_cells = []
 	move_parents = {}
+	attackable_enemy_cells = []
 	move_overlay.clear()
+	attack_overlay.clear()
+
+# UNIT_SELECTED 상태에서 빨간색으로 표시할 적 셀들.
+# reachable 셀에서 인접한 적 셀 + 본인 시작 위치에서 인접한 적 셀.
+func _compute_attackable_enemies(unit: Unit) -> void:
+	attackable_enemy_cells = []
+	var seen: Dictionary = {}
+	for c in reachable_cells:
+		for d in [Vector2i.RIGHT, Vector2i.LEFT, Vector2i.DOWN, Vector2i.UP]:
+			var n: Vector2i = c + d
+			if seen.has(n):
+				continue
+			var v := unit_at(n)
+			if v != null and v.team != unit.team:
+				seen[n] = true
+				attackable_enemy_cells.append(n)
 
 func _commit_move(target: Vector2i) -> void:
 	move_overlay.clear()
+	attack_overlay.clear()
 	if target == selected_unit.cell:
 		_on_move_finished()
 		return
@@ -115,17 +139,47 @@ func _commit_move(target: Vector2i) -> void:
 	u.move_finished.connect(_on_move_finished, CONNECT_ONE_SHOT)
 	u.move_along(_build_path(u.cell, target))
 
+# 적 셀을 직접 지정 → 인접 reachable 셀로 이동 후 자동 공격.
+func _commit_move_then_attack(enemy_cell: Vector2i) -> void:
+	var stand: Vector2i = _best_stand_cell_for_attack(selected_unit, enemy_cell)
+	pending_attack_cell = enemy_cell
+	_commit_move(stand)
+
+func _best_stand_cell_for_attack(unit: Unit, enemy_cell: Vector2i) -> Vector2i:
+	# 인접 후보들 중 reachable이면서 이동 비용이 가장 짧은 셀.
+	var best: Vector2i = unit.cell
+	var best_cost: int = 1_000_000
+	for d in [Vector2i.RIGHT, Vector2i.LEFT, Vector2i.DOWN, Vector2i.UP]:
+		var c: Vector2i = enemy_cell + d
+		if not (c in reachable_cells):
+			continue
+		var cost: int = _build_path(unit.cell, c).size() - 1
+		if cost < best_cost:
+			best_cost = cost
+			best = c
+	return best
+
 func _on_move_finished() -> void:
 	pending_unit = selected_unit
 	selected_unit = null
 	reachable_cells = []
 	move_parents = {}
+	attackable_enemy_cells = []
+	if pending_attack_cell != Vector2i(-1, -1):
+		var target_cell := pending_attack_cell
+		pending_attack_cell = Vector2i(-1, -1)
+		_commit_attack(target_cell)
+		return
 	_enter_attack_selection()
 
 func _enter_attack_selection() -> void:
 	attack_targets = _find_attack_targets(pending_unit)
 	if attack_targets.is_empty():
 		_finish_action()
+		return
+	# 인접 적이 1명이면 선택 메뉴 생략하고 자동 공격.
+	if attack_targets.size() == 1:
+		_commit_attack(attack_targets[0])
 		return
 	state = State.AWAITING_ATTACK
 	attack_overlay.set_cells(attack_targets)
@@ -152,6 +206,7 @@ func _commit_attack(target_cell: Vector2i) -> void:
 
 func _finish_action() -> void:
 	attack_targets = []
+	pending_attack_cell = Vector2i(-1, -1)
 	attack_overlay.clear()
 	if pending_unit != null and is_instance_valid(pending_unit):
 		pending_unit.mark_acted()
